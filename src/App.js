@@ -7,9 +7,11 @@ import Select from 'react-select'
 function App() {
     const [progress, setProgress] = useState(0);
     const [angle, setAngle] = useState(360);
+    const [filename, setFilename] = useState(`Scan_${Date.now()}`);
     const [resolution, setResolution] = useState('High');
     const [partialScan, setPartialScan] = useState(false);
     const [scanning, setScanning] = useState(false);
+    const [scanningEnded, setScanningEnded] = useState(false);
     const [scanningTime, setScanningTime] = useState(0);
     const [startTime, setStartTime] = useState(0);
     const [progressBar, setProgressBar] = useState({width: 0});
@@ -40,7 +42,17 @@ function App() {
                 break
             case 'END':
                 setScanning(false)
-                alert('Сканирование завершено.')
+                setScanningEnded(true)
+                // alert('Сканирование завершено.')
+                break
+            case 'DELETED':
+                alert('Результат сканирования удален')
+                setScanningEnded(false)
+                break
+            case 'SAVED':
+                alert('Результат сканирования сохранен')
+                setScanningEnded(false)
+                break
         }
     }
 
@@ -84,6 +96,35 @@ function App() {
 
             socket.send(JSON.stringify({
                 type: 'STOP'
+            }))
+        } catch (e) {
+            alert(e.message)
+        }
+    }
+
+    const saveHandler = () => {
+        let fn = filename
+        fn.trim();
+        setFilename(fn);
+        if (filename.length) {
+            try {
+                socket.send(JSON.stringify({
+                    type: 'SAVE',
+                    filename: filename,
+                }))
+            } catch (e) {
+                alert(e.message)
+            }
+        } else {
+            alert('Введите имя файла')
+        }
+
+    }
+
+    const deleteHandler = () => {
+        try {
+            socket.send(JSON.stringify({
+                type: 'DELETE',
             }))
         } catch (e) {
             alert(e.message)
@@ -142,78 +183,112 @@ function App() {
                 <div className="row">
                     <div className="col s12 m6  offset-l3">
                         <div className="card teal lighten-5">
-                            <div className="card-content teal-text">
-                                <span className="card-title"><h4>Настройки</h4></span>
+                            {scanningEnded ? (
+                                <div className="card-content teal-text">
+                                    <span className="card-title"><h4>Сканирование завершено</h4></span>
 
-                                <div className="form-field">
-                                    <label htmlFor="resolution">Качество сканирования</label>
-                                    <Select
-                                        options={resolutionOptions}
-                                        placeholder="Выберите качество сканирования"
-                                        id="resolution"
-                                        // type="text"
-                                        // value={category}
-                                        value={resolutionOptions.filter(option => option.label === resolution)}
-                                        onChange={selectHandler}
-                                        styles={customStyles}
-                                    />
-
-                                </div>
-
-                                <div className="form-field">
-                                    <p>
-                                        <label>
-                                            <input type="checkbox" className="filled-in" checked={partialScan}
-                                                   onChange={e => setPartialScan(!partialScan)}/>
-                                            <span>Частичное сканирование</span>
-                                        </label>
-                                    </p>
-                                </div>
-
-                                {partialScan ? (
                                     <div className="form-field">
-                                        <label htmlFor="angle">Угол сканирования в градусах</label>
-                                        <input
-                                            placeholder="Введите угол сканирования"
-                                            id="angle"
-                                            type="text"
-                                            value={angle}
-                                            onChange={e => setAngle(e.target.value)}
-                                        />
+                                        <div className="form-field">
+                                            <label htmlFor="angle">Имя файла</label>
+                                            <input
+                                                placeholder="Введите имя файла"
+                                                id="filename"
+                                                type="text"
+                                                value={filename}
+                                                onChange={e => setFilename(e.target.value)}
+                                            />
+                                        </div>
+
                                     </div>
-                                ) : null}
+
+                                    {/*<div className="form-field">*/}
+                                        {/*<a className="waves-effect waves-light btn-large">Сканировать</a>*/}
+                                        <button className="btn teal" onClick={saveHandler}
+                                                style={{marginRight: 10}}>СОХРАНИТЬ
+                                        </button>
+                                        <button className="btn red darken-3" onClick={deleteHandler}
+                                                style={{marginRight: 10}}>УДАЛИТЬ
+                                        </button>
+
+                                    {/*</div>*/}
+
+                                </div>
+
+                            ) : (
+                                <div className="card-content teal-text">
+                                    <span className="card-title"><h4>Настройки</h4></span>
+
+                                    <div className="form-field">
+                                        <label htmlFor="resolution">Качество сканирования</label>
+                                        <Select
+                                            options={resolutionOptions}
+                                            placeholder="Выберите качество сканирования"
+                                            id="resolution"
+                                            // type="text"
+                                            // value={category}
+                                            value={resolutionOptions.filter(option => option.label === resolution)}
+                                            onChange={selectHandler}
+                                            styles={customStyles}
+                                        />
+
+                                    </div>
+
+                                    <div className="form-field">
+                                        <p>
+                                            <label>
+                                                <input type="checkbox" className="filled-in" checked={partialScan}
+                                                       onChange={e => setPartialScan(!partialScan)}/>
+                                                <span>Частичное сканирование</span>
+                                            </label>
+                                        </p>
+                                    </div>
+
+                                    {partialScan ? (
+                                        <div className="form-field">
+                                            <label htmlFor="angle">Угол сканирования в градусах</label>
+                                            <input
+                                                placeholder="Введите угол сканирования"
+                                                id="angle"
+                                                type="text"
+                                                value={angle}
+                                                onChange={e => setAngle(e.target.value)}
+                                            />
+                                        </div>
+                                    ) : null}
 
 
-                                {scanning ? (
-                                    <>
+                                    {scanning ? (
+                                        <>
+                                            <div className="form-field">
+                                                {/*<a className="waves-effect waves-light btn-large">Сканировать</a>*/}
+                                                <button className="btn red darken-3" onClick={stopScanning}
+                                                        style={{marginRight: 10}}>ПРЕРВАТЬ
+                                                </button>
+
+                                            </div>
+
+                                            <div className="progress">
+                                                <div className="determinate" style={progressBar}/>
+                                            </div>
+                                            <div className="status">
+                                                <p>Прогресс: {progress}%</p>
+                                                <p>Время сканирования: {(Date.now() - startTime) / 1000}с.</p>
+                                            </div>
+                                        </>
+                                    ) : (
                                         <div className="form-field">
                                             {/*<a className="waves-effect waves-light btn-large">Сканировать</a>*/}
-                                            <button className="btn red darken-3" onClick={stopScanning}
-                                                    style={{marginRight: 10}}>ПРЕРВАТЬ
+                                            <button className="btn teal" onClick={startScanning}
+                                                    style={{marginRight: 10}}>СКАНИРОВАТЬ
                                             </button>
 
                                         </div>
-
-                                        <div className="progress">
-                                            <div className="determinate" style={progressBar}/>
-                                        </div>
-                                        <div className="status">
-                                            <p>Прогресс: {progress}%</p>
-                                            <p>Время сканирования: {(Date.now() - startTime) / 1000}с.</p>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="form-field">
-                                        {/*<a className="waves-effect waves-light btn-large">Сканировать</a>*/}
-                                        <button className="btn teal" onClick={startScanning}
-                                                style={{marginRight: 10}}>СКАНИРОВАТЬ
-                                        </button>
-
-                                    </div>
-                                )}
+                                    )}
 
 
-                            </div>
+                                </div>
+
+                            )}
                         </div>
                     </div>
                 </div>
