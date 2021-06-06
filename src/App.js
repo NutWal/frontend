@@ -206,7 +206,8 @@ function App() {
     const {loading, request} = useHttp()
 
 
-    const socket = new WebSocket('ws://192.168.0.105:3000/connect')
+    // const socket = new WebSocket('ws://192.168.0.105:3000/connect')
+    const socket = new WebSocket('ws://localhost:3000/connect')
 
     socket.onopen = () => {
         console.log('connected')
