@@ -14,7 +14,7 @@ import {
 // }
 
 const sceneSizes = {
-    width: 470,
+    width: 800,
     height: 300,
 };
 
@@ -84,31 +84,25 @@ class Three {
     }
 
     renderRect(color) {
-        const boxGeometry = new THREE.BoxGeometry(200, 200, 200);
-        const planeGeometry = new THREE.PlaneGeometry(200, 200);
 
-        const material = new THREE.MeshBasicMaterial({color});
+        for (let i = 0; i <= 5000; i++) {
+            const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
-        this.box = new THREE.Mesh(boxGeometry, material);
+            const material = new THREE.MeshBasicMaterial({color});
 
-        this.box.position.x = 200;
-        this.box.position.y = 0;
-        this.box.position.z = -100;
+            this.box = new THREE.Mesh(boxGeometry, material);
 
-        this.box.rotateX(Math.PI / 6);
-        this.box.rotateY(Math.PI / 6);
+            // this.box.position.x = 200;
+            // this.box.position.y = 0;
+            // this.box.position.z = -100;
 
-        this.plane = new THREE.Mesh(planeGeometry, material);
+            this.box.position.x = Math.floor(Math.random() * 200);
+            this.box.position.y = Math.floor(Math.random() * 200);
+            this.box.position.z = Math.floor(Math.random() * 200);
 
-        this.plane.position.x = -200;
-        this.plane.position.y = 0;
-        this.plane.position.z = -100;
+            this.scene.add(this.box);
+        }
 
-        this.plane.rotateX(Math.PI / 6);
-        this.plane.rotateY(Math.PI / 6);
-
-        this.scene.add(this.box);
-        this.scene.add(this.plane);
     }
 
     animate() {
@@ -118,27 +112,27 @@ class Three {
 
         this.render();
     }
-
-    meshColorChange(meshColor) {
-        // Меняем цвет квадратов
-        this.box.material.color.set(meshColor);
-        this.plane.material.color.set(meshColor);
-
-        // Запускаем рендеринг (отобразится квадрат с новым цветом)
-        this.render();
-    }
-
-    autoRotateChange(autoRotate) {
-        this.controls.autoRotate = autoRotate;
-    }
-
-    autoRotateSpeedChange(autoRotateSpeed) {
-        this.controls.autoRotateSpeed = autoRotateSpeed;
-    }
-
-    enableDampingChange(enableDamping) {
-        this.controls.enableDamping = enableDamping;
-    }
+    //
+    // meshColorChange(meshColor) {
+    //     // Меняем цвет квадратов
+    //     this.box.material.color.set(meshColor);
+    //     this.plane.material.color.set(meshColor);
+    //
+    //     // Запускаем рендеринг (отобразится квадрат с новым цветом)
+    //     this.render();
+    // }
+    //
+    // autoRotateChange(autoRotate) {
+    //     this.controls.autoRotate = autoRotate;
+    // }
+    //
+    // autoRotateSpeedChange(autoRotateSpeed) {
+    //     this.controls.autoRotateSpeed = autoRotateSpeed;
+    // }
+    //
+    // enableDampingChange(enableDamping) {
+    //     this.controls.enableDamping = enableDamping;
+    // }
 }
 
 export default Three;

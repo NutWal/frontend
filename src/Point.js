@@ -10,7 +10,8 @@ export const Point = (props) => {
         <mesh {...props} ref={ref}>
             {/*<directionalLight position={[10, 10, 10]} />*/}
             {/*<circleGeometry args={[1, 8, 6]} />*/}
-            <sphereGeometry args={[0.5, 8, 6]} />
+            {/*<sphereGeometry args={[0.5, 8, 6]} />*/}
+            <boxGeometry args={[0.2, 0.2, 0.2]} />
             {/*<boxGeometry args={[1, 1, 1]} />*/}
             <meshBasicMaterial color="green" />
         </mesh>

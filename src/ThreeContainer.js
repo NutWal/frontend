@@ -9,7 +9,7 @@ import {
 
 import Three from "./Three";
 
-const NativeRenderer = () => {
+const NativeRenderer = (props) => {
     const threeRef = useRef(); //Используется для обращения к контейнеру для canvas
     const three = useRef(); //Служит для определения, создан ли объект, чтобы не создавать повторный
 
@@ -30,29 +30,29 @@ const NativeRenderer = () => {
         }
     }, [meshColor, autoRotate]);
 
-    useEffect(() => {
-        if (three.current) {
-            three.current.meshColorChange(meshColor);
-        }
-    }, [meshColor]);
-
-    useEffect(() => {
-        if (three.current) {
-            three.current.autoRotateChange(autoRotate);
-        }
-    }, [autoRotate]);
-
-    useEffect(() => {
-        if (three.current) {
-            three.current.autoRotateSpeedChange(autoRotateSpeed);
-        }
-    }, [autoRotateSpeed]);
-
-    useEffect(() => {
-        if (three.current) {
-            three.current.enableDampingChange(enableDamping);
-        }
-    }, [enableDamping]);
+    // useEffect(() => {
+    //     if (three.current) {
+    //         three.current.meshColorChange(meshColor);
+    //     }
+    // }, [meshColor]);
+    //
+    // useEffect(() => {
+    //     if (three.current) {
+    //         three.current.autoRotateChange(autoRotate);
+    //     }
+    // }, [autoRotate]);
+    //
+    // useEffect(() => {
+    //     if (three.current) {
+    //         three.current.autoRotateSpeedChange(autoRotateSpeed);
+    //     }
+    // }, [autoRotateSpeed]);
+    //
+    // useEffect(() => {
+    //     if (three.current) {
+    //         three.current.enableDampingChange(enableDamping);
+    //     }
+    // }, [enableDamping]);
 
     return (
         <div>
@@ -123,4 +123,5 @@ const NativeRenderer = () => {
     );
 };
 
-export default memo(NativeRenderer);
+// export default memo(NativeRenderer);
+export default NativeRenderer
