@@ -87,8 +87,8 @@ function App() {
 
 
     // const [socketUrl, setSocketUrl] = useState('ws://localhost:3000/connect');
-    // const [socketUrl, setSocketUrl] = useState('ws://localhost:3002');
-    const [socketUrl, setSocketUrl] = useState('ws://192.168.43.237:3002/');
+    const [socketUrl, setSocketUrl] = useState('ws://localhost:3002');
+    // const [socketUrl, setSocketUrl] = useState('ws://192.168.43.237:3002/');
     // const [socketUrl, setSocketUrl] = useState('ws://192.168.43.131:3000/connect');
     const messageHistory = useRef([]);
 
