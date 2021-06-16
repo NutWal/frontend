@@ -18,7 +18,7 @@ export const PointsCloudViewer = (props) => {
     const NORMAL_OFFSET = 0.1 * 1
 
     let v = [];
-    let n = [];
+    // let n = [];
 
     points.map((point, index) => {
 
@@ -52,12 +52,12 @@ export const PointsCloudViewer = (props) => {
             v.push(sourcePointY)
             v.push(sourcePointZ)
 
-            // передняя нормаль
-            for (let i = 0; i < 6; i++) {
-                n.push((sourcePointX + sourcePointX + SIZE) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointY + sourcePointY + SIZE) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointZ + sourcePointZ) / 2 + NORMAL_OFFSET)
-            }
+            // // передняя нормаль
+            // for (let i = 0; i < 6; i++) {
+            //     n.push((sourcePointX + sourcePointX + SIZE) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointY + sourcePointY + SIZE) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointZ + sourcePointZ) / 2 + NORMAL_OFFSET)
+            // }
 
             // правая стенка
             v.push(sourcePointX + SIZE)
@@ -84,12 +84,12 @@ export const PointsCloudViewer = (props) => {
             v.push(sourcePointY)
             v.push(sourcePointZ)
 
-            // правая нормаль
-            for (let i = 0; i < 6; i++) {
-                n.push((sourcePointX + SIZE + sourcePointX + SIZE) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointY + sourcePointY + SIZE) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointZ + sourcePointZ + SIZE) / 2 + NORMAL_OFFSET)
-            }
+            // // правая нормаль
+            // for (let i = 0; i < 6; i++) {
+            //     n.push((sourcePointX + SIZE + sourcePointX + SIZE) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointY + sourcePointY + SIZE) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointZ + sourcePointZ + SIZE) / 2 + NORMAL_OFFSET)
+            // }
 
             // левая стенка
             v.push(sourcePointX)
@@ -116,12 +116,12 @@ export const PointsCloudViewer = (props) => {
             v.push(sourcePointY)
             v.push(sourcePointZ + SIZE)
 
-            // левая нормаль
-            for (let i = 0; i < 6; i++) {
-                n.push((sourcePointX + sourcePointX) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointY + sourcePointY + SIZE) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointZ + sourcePointZ + SIZE) / 2 + NORMAL_OFFSET)
-            }
+            // // левая нормаль
+            // for (let i = 0; i < 6; i++) {
+            //     n.push((sourcePointX + sourcePointX) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointY + sourcePointY + SIZE) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointZ + sourcePointZ + SIZE) / 2 + NORMAL_OFFSET)
+            // }
 
             // задняя стенка
             v.push(sourcePointX + SIZE)
@@ -148,12 +148,12 @@ export const PointsCloudViewer = (props) => {
             v.push(sourcePointY)
             v.push(sourcePointZ + SIZE)
 
-            // задняя нормаль
-            for (let i = 0; i < 6; i++) {
-                n.push((sourcePointX + SIZE + sourcePointX) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointY + sourcePointY + SIZE) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointZ + SIZE + sourcePointZ + SIZE) / 2 + NORMAL_OFFSET)
-            }
+            // // задняя нормаль
+            // for (let i = 0; i < 6; i++) {
+            //     n.push((sourcePointX + SIZE + sourcePointX) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointY + sourcePointY + SIZE) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointZ + SIZE + sourcePointZ + SIZE) / 2 + NORMAL_OFFSET)
+            // }
 
             // верхняя стенка
             v.push(sourcePointX)
@@ -180,12 +180,12 @@ export const PointsCloudViewer = (props) => {
             v.push(sourcePointY)
             v.push(sourcePointZ + SIZE)
 
-            // верхняя нормаль
-            for (let i = 0; i < 6; i++) {
-                n.push((sourcePointX + SIZE + sourcePointX) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointY + sourcePointY) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointZ + sourcePointZ + SIZE) / 2 + NORMAL_OFFSET)
-            }
+            // // верхняя нормаль
+            // for (let i = 0; i < 6; i++) {
+            //     n.push((sourcePointX + SIZE + sourcePointX) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointY + sourcePointY) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointZ + sourcePointZ + SIZE) / 2 + NORMAL_OFFSET)
+            // }
 
             // нижняя стенка
             v.push(sourcePointX)
@@ -212,12 +212,12 @@ export const PointsCloudViewer = (props) => {
             v.push(sourcePointY + SIZE)
             v.push(sourcePointZ + SIZE)
 
-            // нижняя нормаль
-            for (let i = 0; i < 6; i++) {
-                n.push((sourcePointX + SIZE + sourcePointX) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointY + SIZE + sourcePointY + SIZE) / 2 + NORMAL_OFFSET)
-                n.push((sourcePointZ + sourcePointZ + SIZE) / 2 + NORMAL_OFFSET)
-            }
+            // // нижняя нормаль
+            // for (let i = 0; i < 6; i++) {
+            //     n.push((sourcePointX + SIZE + sourcePointX) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointY + SIZE + sourcePointY + SIZE) / 2 + NORMAL_OFFSET)
+            //     n.push((sourcePointZ + sourcePointZ + SIZE) / 2 + NORMAL_OFFSET)
+            // }
         }
 
     })
@@ -232,7 +232,7 @@ export const PointsCloudViewer = (props) => {
 // create a simple square shape. We duplicate the top left and bottom right
 // vertices because each vertex needs to appear once per triangle.
     const vertices = new Float32Array( v );
-    const normals = new Float32Array( n );
+    // const normals = new Float32Array( n );
 
 
     console.log('vertices',vertices)
