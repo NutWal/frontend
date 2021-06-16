@@ -404,10 +404,10 @@ function App() {
                                     <span className="card-title"><h4>Сканирование завершено</h4></span>
 
                                     <div className="points-cloud-viewer-box">
-                                        <Suspense fallback={<div>Loading... </div>}>
-                                            <PointsCloudViewer points={store.getState().points} quality={1}/>
-                                            {/*<ThreeContainer/>*/}
-                                        </Suspense>
+                                        {/*<Suspense fallback={<div>Loading... </div>}>*/}
+                                        {/*    <PointsCloudViewer points={store.getState().points} quality={1}/>*/}
+                                        {/*    /!*<ThreeContainer/>*!/*/}
+                                        {/*</Suspense>*/}
                                     </div>
 
                                     <div className="status">
