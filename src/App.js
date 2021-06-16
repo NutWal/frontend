@@ -1,11 +1,13 @@
 import './App.css';
-import React, {useEffect, useState, useCallback, Suspense} from 'react'
+import React, {useEffect, useState, useCallback, Suspense, useRef, useMemo} from 'react'
 import {useHttp} from './hooks/http.hook'
 import Select from 'react-select'
 import {bindActionCreators, createStore} from 'redux'
 import {connect, Provider} from 'react-redux'
 import {PointsCloudViewer} from './PointsCloudViewer'
 import ThreeContainer from "./ThreeContainer";
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+
 
 
 
@@ -48,7 +50,18 @@ const changePoints = (newPoints) => {
 }
 
 
-
+// this.connect = function () {
+//     // const socket = new WebSocket('ws://192.168.0.105:3000/connect')
+//     // const socket = new WebSocket('ws://172.20.10.6:3000/connect')
+//     // const socket = new WebSocket('ws://192.168.43.237:3001/connect')
+//     const socket = new WebSocket('ws://localhost:3000/connect')
+//
+//     let that = this
+//
+//     socket.onopen = () => {
+//         console.log('connected')
+//     }
+// }
 
 function App() {
     const [progress, setProgress] = useState(0);
@@ -64,114 +77,187 @@ function App() {
     const [scanningEndTime, setScanningEndTime] = useState(0);
     const [startTime, setStartTime] = useState(0);
     const [progressBar, setProgressBar] = useState({width: 0});
+    const [ws, setWs] = useState(null)
 
 
-    const {loading, request} = useHttp()
+    // useEffect(() => {
+    //     this.connect();
+    // }
+
+
+
+    // const [socketUrl, setSocketUrl] = useState('ws://localhost:3000/connect');
+    const [socketUrl, setSocketUrl] = useState('ws://localhost:3002');
+    const messageHistory = useRef([]);
+
+    const {
+        sendMessage,
+        sendJsonMessage,
+        lastMessage,
+        lastJsonMessage,
+        readyState,
+        getWebSocket
+    } = useWebSocket(socketUrl, {
+        onOpen: () => console.log('opened'),
+        onMessage: async (e) => {
+            console.log(e)
+            let msg = JSON.parse(e.data)
+            console.log(msg)
+            switch (msg.type) {
+                case 'PROGRESS':
+                    setScanning(true)
+                    setProgress(msg.progress)
+                    const num = 500 / 100 * msg.progress
+                    setProgressBar({width: num})
+                    // setScanningTime(Date.now() - startTime)
+                    // setScanningTime(Date.now())
+                    let time = Date.now() - startTime
+                    setScanningTime(time)
+
+                    // await addPoints(points, msg.points)
+
+                    let old_points = store.getState().points
+                    //
+                    // console.log('points', points)
+                    console.log('old_points', old_points)
+
+                    // let v = []
+                    //
+                    // msg.points.map((point, index) => {
+                    //     v.push(point[1])
+                    //     v.push((point[2] * -1)- 50)
+                    //     v.push(point[0])
+                    // })
+
+                    //
+                    let new_points = old_points.concat(msg.points)
+                    //
+                    console.log('new_points.length', new_points.length)
+
+                    await store.dispatch(changePoints(new_points))
+                    //
+                    // setPoints(new_points)
+
+                    break
+                case 'END':
+                    setScanning(false)
+                    setScanningEnded(true)
+                    // alert('Сканирование завершено.')
+                    break
+                case 'DELETED':
+                    alert('Результат сканирования удален')
+                    setScanningEnded(false)
+                    window.location.reload()
+                    break
+                case 'SAVED':
+                    alert('Результат сканирования сохранен')
+                    setScanningEnded(false)
+                    window.location.reload()
+                    break
+            }
+        },
+        //Will attempt to reconnect on all close events, such as server shutting down
+        shouldReconnect: (closeEvent) => true,
+
+        share: true
+    });
+
+    messageHistory.current = useMemo(() =>
+        messageHistory.current.concat(lastMessage),[lastMessage]);
+
+    // const handleClickSendMessage = useCallback(() =>
+    //     sendMessage('Hello'), []);
+
+    const connectionStatus = {
+        [ReadyState.CONNECTING]: 'Connecting',
+        [ReadyState.OPEN]: 'Open',
+        [ReadyState.CLOSING]: 'Closing',
+        [ReadyState.CLOSED]: 'Closed',
+        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
+    }[readyState];
+
 
 
     // const socket = new WebSocket('ws://192.168.0.105:3000/connect')
     // const socket = new WebSocket('ws://172.20.10.6:3000/connect')
     // const socket = new WebSocket('ws://192.168.43.237:3001/connect')
-    const socket = new WebSocket('ws://localhost:3000/connect')
+    // const socket = new WebSocket('ws://localhost:3000/connect')
 
-    socket.onopen = () => {
-        console.log('connected')
-    }
-
-    socket.onmessage = async (e) => {
-        let msg = JSON.parse(e.data)
-        console.log(msg)
-        switch (msg.type) {
-            case 'PROGRESS':
-                setScanning(true)
-                setProgress(msg.progress)
-                const num = 500 / 100 * msg.progress
-                setProgressBar({width: num})
-                // setScanningTime(Date.now() - startTime)
-                // setScanningTime(Date.now())
-                let time = Date.now() - startTime
-                setScanningTime(time)
-
-                // await addPoints(points, msg.points)
-
-                let old_points = store.getState().points
-                //
-                // console.log('points', points)
-                console.log('old_points', old_points)
-
-                // let v = []
-                //
-                // msg.points.map((point, index) => {
-                //     v.push(point[1])
-                //     v.push((point[2] * -1)- 50)
-                //     v.push(point[0])
-                // })
-
-                //
-                let new_points = old_points.concat(msg.points)
-                //
-                console.log('new_points.length', new_points.length)
-
-                await store.dispatch(changePoints(new_points))
-                //
-                // setPoints(new_points)
-
-                break
-            case 'END':
-                setScanning(false)
-                setScanningEnded(true)
-                // alert('Сканирование завершено.')
-                break
-            case 'DELETED':
-                alert('Результат сканирования удален')
-                setScanningEnded(false)
-                window.location.reload()
-                break
-            case 'SAVED':
-                alert('Результат сканирования сохранен')
-                setScanningEnded(false)
-                window.location.reload()
-                break
-        }
-    }
-
-    socket.onclose = function(event) {
-        if (event.wasClean) {
-            console.log(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
-        } else {
-            // например, сервер убил процесс или сеть недоступна
-            // обычно в этом случае event.code 1006
-            console.log('[close] Соединение прервано');
-        }
-    };
-
-    socket.onerror = function(error) {
-        console.log(`[error] ${error.message}`);
-    };
-
-    // const getPoints = async () => {
-    //     return points
+    // socket.onopen = () => {
+    //     console.log('connected')
     // }
 
-    // async function getPoints() {
-    //     return points
+    // socket.onmessage = async (e) => {
+    // onmessage = async (e) => {
+    //     let msg = JSON.parse(e.data)
+    //     console.log(msg)
+    //     switch (msg.type) {
+    //         case 'PROGRESS':
+    //             setScanning(true)
+    //             setProgress(msg.progress)
+    //             const num = 500 / 100 * msg.progress
+    //             setProgressBar({width: num})
+    //             // setScanningTime(Date.now() - startTime)
+    //             // setScanningTime(Date.now())
+    //             let time = Date.now() - startTime
+    //             setScanningTime(time)
+    //
+    //             // await addPoints(points, msg.points)
+    //
+    //             let old_points = store.getState().points
+    //             //
+    //             // console.log('points', points)
+    //             console.log('old_points', old_points)
+    //
+    //             // let v = []
+    //             //
+    //             // msg.points.map((point, index) => {
+    //             //     v.push(point[1])
+    //             //     v.push((point[2] * -1)- 50)
+    //             //     v.push(point[0])
+    //             // })
+    //
+    //             //
+    //             let new_points = old_points.concat(msg.points)
+    //             //
+    //             console.log('new_points.length', new_points.length)
+    //
+    //             await store.dispatch(changePoints(new_points))
+    //             //
+    //             // setPoints(new_points)
+    //
+    //             break
+    //         case 'END':
+    //             setScanning(false)
+    //             setScanningEnded(true)
+    //             // alert('Сканирование завершено.')
+    //             break
+    //         case 'DELETED':
+    //             alert('Результат сканирования удален')
+    //             setScanningEnded(false)
+    //             window.location.reload()
+    //             break
+    //         case 'SAVED':
+    //             alert('Результат сканирования сохранен')
+    //             setScanningEnded(false)
+    //             window.location.reload()
+    //             break
+    //     }
     // }
 
+    // socket.onclose = function(event) {
+    //     if (event.wasClean) {
+    //         console.log(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
+    //     } else {
+    //         // например, сервер убил процесс или сеть недоступна
+    //         // обычно в этом случае event.code 1006
+    //         console.log('[close] Соединение прервано');
+    //     }
+    // };
 
-    // const addPoints = useCallback(async (op, np) => {
-    //     let old_points = points
-    //     // let old_points = await getPoints()
-    //
-    //     // console.log('points', points)
-    //     // console.log('old_points', old_points)
-    //
-    //     let new_points = old_points.concat(np)
-    //
-    //     console.log('new_points.length', new_points.length)
-    //
-    //     setPoints(new_points)
-    // }, [])
-
+    // socket.onerror = function(error) {
+    //     console.log(`[error] ${error.message}`);
+    // };
 
 
     const startScanning = () => {
@@ -179,9 +265,12 @@ function App() {
         setProgressBar({width: 0})
         setStartTime(Date.now())
 
+        console.log('start button clicked!')
+
 
         try {
-            socket.send(JSON.stringify({
+            // socket.send(JSON.stringify({
+            sendMessage(JSON.stringify({
                 type: 'START',
                 resolution,
                 angle,
@@ -196,7 +285,8 @@ function App() {
         try {
             // const fetched = await request('http://localhost:3000/stop', 'GET')
 
-            socket.send(JSON.stringify({
+            // socket.send(JSON.stringify({
+            sendMessage(JSON.stringify({
                 type: 'STOP'
             }))
         } catch (e) {
@@ -210,7 +300,8 @@ function App() {
         setFilename(fn);
         if (filename.length) {
             try {
-                socket.send(JSON.stringify({
+                // socket.send(JSON.stringify({
+                sendMessage(JSON.stringify({
                     type: 'SAVE',
                     filename: filename,
                 }))
@@ -225,7 +316,8 @@ function App() {
 
     const deleteHandler = () => {
         try {
-            socket.send(JSON.stringify({
+            // socket.send(JSON.stringify({
+            sendMessage(JSON.stringify({
                 type: 'DELETE',
             }))
         } catch (e) {
@@ -268,10 +360,6 @@ function App() {
         // console.log(value.value)
     }
 
-    useEffect(() => {
-        // window.M.updateTextFields()
-
-    }, [])
 
     // стили для селекта
     const customStyles = {
