@@ -240,7 +240,7 @@ export const PointsCloudViewer = (props) => {
 
 // itemSize = 3 because there are 3 values (components) per vertex
     buffergeometry.setAttribute( 'position', new THREE.BufferAttribute( vertices,3 ) );
-    buffergeometry.setAttribute( 'normal', new THREE.BufferAttribute( normals,3 ) );
+    // buffergeometry.setAttribute( 'normal', new THREE.BufferAttribute( normals,3 ) );
 
 
     // const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
