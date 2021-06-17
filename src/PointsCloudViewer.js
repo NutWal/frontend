@@ -14,8 +14,8 @@ export const PointsCloudViewer = (props) => {
     let points = props.points
     let quality = props.quality
 
-    const SIZE = 0.5
-    const NORMAL_OFFSET = 0.1 * 1
+    const SIZE = 1
+    const NORMAL_OFFSET = 0.1 * -1
 
     let v = [];
     // let n = [];
@@ -24,8 +24,8 @@ export const PointsCloudViewer = (props) => {
 
         if (index % quality == 0) {
             const sourcePointX = point[1]
-            const sourcePointY = (point[2] * -1)
-            const sourcePointZ = point[0]
+            const sourcePointY = (point[0] * -1)
+            const sourcePointZ = point[2] - 300
 
             // передняя стенка
             v.push(sourcePointX)
@@ -251,10 +251,10 @@ export const PointsCloudViewer = (props) => {
 
     return (
         // <Canvas camera={{position: [0, 0, 5]}}>
-        <Canvas mode="concurrent" camera={{position: [0, 50, 170]}} className="canvas-box" style={{minHeight: 200}}>
+        <Canvas mode="concurrent" camera={{position: [0, 500, 0]}} className="canvas-box" style={{minHeight: 200, background: '#fff'}}>
             {/*<Suspense fallback={<div>Loading... </div>}>*/}
                 {/*<Scene/>*/}
-                {/*<primitive object={useLoader(OBJLoader, './Elka.obj')}/>*/}
+                {/*<primitive object={useLoader(OBJLoader, './cock.obj')}/>*/}
                 <primitive object={mesh}/>
 
 

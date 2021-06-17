@@ -197,7 +197,7 @@ function App() {
                         setLoading(false)
                     }
                     alert(msg.message)
-                    setScanningEnded(false)
+                    // setScanningEnded(false)
                     // window.location.reload()
                     break
             }
@@ -311,6 +311,7 @@ function App() {
         setProgressBar({width: 0})
         setStartTime(Date.now())
         setLoading(true)
+
 
         console.log('start button clicked!')
 
@@ -466,7 +467,7 @@ function App() {
 
                                     <div className="status">
                                         <p>Точек получено: {store.getState().points.length}</p>
-                                        <p>Точек отрисовано: {Math.floor((store.getState().points.length) / previewQuality)}</p>
+                                        {/*<p>Точек отрисовано: {Math.floor((store.getState().points.length) / previewQuality)}</p>*/}
                                         {/*<p>Время сканирования: {timeToString((Date.now() - startTime) / 1000)}</p>*/}
                                         <p>Время сканирования: {scanningTime}</p>
                                     </div>
@@ -522,10 +523,10 @@ function App() {
                                         <>
                                             <span className="card-title"><h4>Сканирование</h4></span>
                                             <div className="points-cloud-viewer-box">
-                                                {/*<Suspense fallback={<div>Loading... </div>}>*/}
-                                                {/*<PointsCloudViewer points={store.getState().points} quality={previewQuality}/>*/}
-                                                {/*/!*<ThreeContainer/>*!/*/}
-                                                {/*</Suspense>*/}
+                                                <Suspense fallback={<div>Loading... </div>}>
+                                                <PointsCloudViewer points={store.getState().points} quality={previewQuality}/>
+                                                {/*<ThreeContainer/>*/}
+                                                </Suspense>
                                             </div>
 
                                             <div className="form-field">
