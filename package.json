@@ -15,6 +15,7 @@
     "react-redux": "^7.2.4",
     "react-scripts": "4.0.3",
     "react-select": "^4.3.0",
+    "react-toastify": "^7.0.4",
     "react-use-websocket": "^2.7.1",
     "redux": "^4.1.0",
     "three": "^0.129.0",

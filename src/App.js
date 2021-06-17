@@ -7,6 +7,11 @@ import {connect, Provider} from 'react-redux'
 import {PointsCloudViewer} from './PointsCloudViewer'
 import ThreeContainer from "./ThreeContainer";
 import useWebSocket, { ReadyState } from 'react-use-websocket';
+// import {useMessage} from "./hooks/message.hook";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {Loader} from './Loader'
+
 
 
 
@@ -64,6 +69,7 @@ const changePoints = (newPoints) => {
 // }
 
 function App() {
+
     const [progress, setProgress] = useState(0);
     const [angle, setAngle] = useState(360);
     const [filename, setFilename] = useState(`Scan_${Date.now()}`);
@@ -73,21 +79,29 @@ function App() {
     const [partialScan, setPartialScan] = useState(false);
     const [scanning, setScanning] = useState(false);
     const [scanningEnded, setScanningEnded] = useState(false);
-    const [scanningTime, setScanningTime] = useState(0);
+    const [scanningTime, setScanningTime] = useState('');
     const [scanningEndTime, setScanningEndTime] = useState(0);
     const [startTime, setStartTime] = useState(0);
     const [progressBar, setProgressBar] = useState({width: 0});
+    const [loading, setLoading] = useState(false);
     const [ws, setWs] = useState(null)
 
 
-    // useEffect(() => {
-    //     this.connect();
+    const message = () => toast('text');
+    // function message(){
+    //     toast('text');
     // }
 
 
 
-    // const [socketUrl, setSocketUrl] = useState('ws://localhost:3000/connect');
-    const [socketUrl, setSocketUrl] = useState('ws://localhost:3002');
+    // useEffect(() => {
+    //     window.M.updateTextFields()
+    // })
+
+
+
+    const [socketUrl, setSocketUrl] = useState('ws://localhost:3000/connect');
+    // const [socketUrl, setSocketUrl] = useState('ws://localhost:3002');
     // const [socketUrl, setSocketUrl] = useState('ws://192.168.43.237:3002');
     // const [socketUrl, setSocketUrl] = useState('ws://192.168.43.131:3000/connect');
     const messageHistory = useRef([]);
@@ -107,7 +121,15 @@ function App() {
             console.log(msg)
             switch (msg.type) {
                 case 'PROGRESS':
-                    setScanning(true)
+                    const isScanning = scanning
+
+                    if (loading) {
+                        setLoading(false)
+                    }
+
+                    if (!isScanning) {
+                        setScanning(true)
+                    }
                     setProgress(msg.progress)
                     const num = 500 / 100 * msg.progress
                     setProgressBar({width: num})
@@ -142,22 +164,41 @@ function App() {
 
                     break
                 case 'END':
+                    setScanningTime(timeToString((Date.now() - startTime) / 1000))
                     setScanning(false)
                     setScanningEnded(true)
+                    setLoading(false)
                     if (msg.message !== undefined) {
                         alert(msg.message)
                     }
                     // alert('Сканирование завершено.')
+
                     break
                 case 'DELETED':
+                    if (loading) {
+                        setLoading(false)
+                    }
+                    // message('Результат сканирования удален')
+                    // message()
                     alert('Результат сканирования удален')
                     setScanningEnded(false)
-                    window.location.reload()
+                    // window.location.reload()
                     break
                 case 'SAVED':
+                    if (loading) {
+                        setLoading(false)
+                    }
                     alert('Результат сканирования сохранен')
                     setScanningEnded(false)
-                    window.location.reload()
+                    // window.location.reload()
+                    break
+                case 'SAVE_STATUS':
+                    if (loading) {
+                        setLoading(false)
+                    }
+                    alert(msg.message)
+                    setScanningEnded(false)
+                    // window.location.reload()
                     break
             }
         },
@@ -269,6 +310,7 @@ function App() {
         setProgress(0)
         setProgressBar({width: 0})
         setStartTime(Date.now())
+        setLoading(true)
 
         console.log('start button clicked!')
 
@@ -287,6 +329,7 @@ function App() {
     }
 
     const stopScanning = () => {
+        setLoading(true)
         try {
             // const fetched = await request('http://localhost:3000/stop', 'GET')
 
@@ -300,6 +343,7 @@ function App() {
     }
 
     const saveHandler = () => {
+        setLoading(true)
         let fn = filename
         fn.trim();
         setFilename(fn);
@@ -314,6 +358,7 @@ function App() {
                 alert(e.message)
             }
         } else {
+            setLoading(false)
             alert('Введите имя файла')
         }
 
@@ -322,6 +367,7 @@ function App() {
     const deleteHandler = () => {
         try {
             // socket.send(JSON.stringify({
+            setLoading(true)
             sendMessage(JSON.stringify({
                 type: 'DELETE',
             }))
@@ -396,6 +442,9 @@ function App() {
         }),
     };
 
+    if (loading) {
+        return <Loader/>
+    }
 
     return (
         <div className="app">
@@ -417,8 +466,9 @@ function App() {
 
                                     <div className="status">
                                         <p>Точек получено: {store.getState().points.length}</p>
-                                        <p>Точек отрисовано: {Math.floor(store.getState().points.length / previewQuality)}</p>
-                                        <p>Время сканирования: {timeToString((Date.now() - startTime) / 1000)}</p>
+                                        <p>Точек отрисовано: {Math.floor((store.getState().points.length) / previewQuality)}</p>
+                                        {/*<p>Время сканирования: {timeToString((Date.now() - startTime) / 1000)}</p>*/}
+                                        <p>Время сканирования: {scanningTime}</p>
                                     </div>
 
                                     {/*<div className="form-field">*/}
@@ -501,12 +551,12 @@ function App() {
 
                                             </div>
 
-                                            <div className="progress">
-                                                <div className="determinate" style={progressBar}/>
-                                            </div>
+                                            {/*<div className="progress">*/}
+                                            {/*    <div className="determinate" style={progressBar}/>*/}
+                                            {/*</div>*/}
                                             <div className="status">
-                                                <p>Точек получено: {store.getState().points.length / 3}</p>
-                                                <p>Точек отрисовано: {Math.floor(store.getState().points.length / previewQuality)}</p>
+                                                <p>Точек получено: {store.getState().points.length}</p>
+                                                <p>Точек отрисовано: {Math.floor((store.getState().points.length) / previewQuality)}</p>
                                                 <p>Прогресс: {progress}%</p>
                                                 <p>Время сканирования: {timeToString((Date.now() - startTime) / 1000)}</p>
                                             </div>
