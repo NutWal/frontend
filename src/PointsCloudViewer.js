@@ -14,7 +14,7 @@ export const PointsCloudViewer = (props) => {
     let points = props.points
     let quality = props.quality
 
-    const SIZE = 1
+    const SIZE = 2
     const NORMAL_OFFSET = 0.1 * -1
 
     let v = [];

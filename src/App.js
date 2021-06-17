@@ -1,19 +1,13 @@
 import './App.css';
-import React, {useEffect, useState, useCallback, Suspense, useRef, useMemo} from 'react'
-import {useHttp} from './hooks/http.hook'
+import React, {Suspense, useMemo, useRef, useState} from 'react'
 import Select from 'react-select'
 import {bindActionCreators, createStore} from 'redux'
-import {connect, Provider} from 'react-redux'
 import {PointsCloudViewer} from './PointsCloudViewer'
-import ThreeContainer from "./ThreeContainer";
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import useWebSocket, {ReadyState} from 'react-use-websocket';
 // import {useMessage} from "./hooks/message.hook";
-import { ToastContainer, toast } from 'react-toastify';
+import {toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Loader} from './Loader'
-
-
-
 
 
 const initialState = {
@@ -73,7 +67,7 @@ function App() {
     const [progress, setProgress] = useState(0);
     const [angle, setAngle] = useState(360);
     const [filename, setFilename] = useState(`Scan_${Date.now()}`);
-    const [resolution, setResolution] = useState('High');
+    const [resolution, setResolution] = useState('Low');
     const [previewQualityLabel, setPreviewQualityLabel] = useState('Medium');
     const [previewQuality, setPreviewQuality] = useState(10);
     const [partialScan, setPartialScan] = useState(false);
@@ -93,11 +87,9 @@ function App() {
     // }
 
 
-
     // useEffect(() => {
     //     window.M.updateTextFields()
     // })
-
 
 
     // const [socketUrl, setSocketUrl] = useState('ws://localhost:3000/connect');
@@ -209,7 +201,7 @@ function App() {
     });
 
     messageHistory.current = useMemo(() =>
-        messageHistory.current.concat(lastMessage),[lastMessage]);
+        messageHistory.current.concat(lastMessage), [lastMessage]);
 
     // const handleClickSendMessage = useCallback(() =>
     //     sendMessage('Hello'), []);
@@ -221,7 +213,6 @@ function App() {
         [ReadyState.CLOSED]: 'Closed',
         [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
     }[readyState];
-
 
 
     // const socket = new WebSocket('ws://192.168.0.105:3000/connect')
@@ -306,11 +297,13 @@ function App() {
     // };
 
 
-    const startScanning = () => {
+    const startScanning = async () => {
         setProgress(0)
         setProgressBar({width: 0})
         setStartTime(Date.now())
         setLoading(true)
+
+        await store.dispatch(changePoints([]))
 
 
         console.log('start button clicked!')
@@ -378,15 +371,15 @@ function App() {
     }
 
     const resolutionOptions = [
-        {value: '1', label: 'High'},
+        {value: '3', label: 'Low'},
         {value: '2', label: 'Medium'},
-        {value: '3', label: 'Low'}
+        {value: '1', label: 'High'}
     ]
 
     const previewQualityOptions = [
         {value: '1', label: 'Source'},
         {value: '10', label: 'High'},
-        {value: '30', label: 'Medium'},
+        {value: '40', label: 'Medium'},
         {value: '50', label: 'Low'}
     ]
 
@@ -453,7 +446,7 @@ function App() {
                 <div className="row">
                     {/*<div className="col s12 m6 offset-l3">*/}
                     <div className="col s12 m10 offset-m1">
-                        <div className="card teal lighten-5">
+                        <div className="card white card-style">
                             {scanningEnded ? (
                                 <div className="card-content teal-text">
                                     <span className="card-title"><h4>Сканирование завершено</h4></span>
@@ -502,13 +495,15 @@ function App() {
                                     </div>
 
                                     {/*<div className="form-field">*/}
-                                        {/*<a className="waves-effect waves-light btn-large">Сканировать</a>*/}
-                                        <button className="btn teal" onClick={saveHandler}
-                                                style={{marginRight: 10}}>СОХРАНИТЬ
+                                    {/*<a className="waves-effect waves-light btn-large">Сканировать</a>*/}
+                                    <div className="button-group">
+                                        <button className="btn red darken-3 button-l" onClick={deleteHandler}>
+                                            УДАЛИТЬ
                                         </button>
-                                        <button className="btn red darken-3" onClick={deleteHandler}
-                                                style={{marginRight: 10}}>УДАЛИТЬ
+                                        <button className="btn green darken-4 button-r" onClick={saveHandler}>
+                                            СОХРАНИТЬ
                                         </button>
+                                    </div>
 
                                     {/*</div>*/}
 
@@ -518,99 +513,102 @@ function App() {
                                 <div className="card-content teal-text">
 
 
-
                                     {scanning ? (
                                         <>
                                             <span className="card-title"><h4>Сканирование</h4></span>
                                             <div className="points-cloud-viewer-box">
                                                 <Suspense fallback={<div>Loading... </div>}>
-                                                <PointsCloudViewer points={store.getState().points} quality={previewQuality}/>
-                                                {/*<ThreeContainer/>*/}
+                                                    <PointsCloudViewer points={store.getState().points}
+                                                                       quality={previewQuality}/>
+                                                    {/*<ThreeContainer/>*/}
                                                 </Suspense>
                                             </div>
 
-                                            <div className="form-field">
-                                                <label htmlFor="quality">Качество предпросмотра</label>
-                                                <Select
-                                                    options={previewQualityOptions}
-                                                    placeholder="Выберите качество предпросмотра"
-                                                    id="quality"
-                                                    // type="text"
-                                                    // value={category}
-                                                    value={previewQualityOptions.filter(option => option.label === previewQualityLabel)}
-                                                    onChange={selectPreviewQualityHandler}
-                                                    styles={customStyles}
-                                                />
+                                            {/*<div className="form-field">*/}
+                                            {/*    <label htmlFor="quality">Качество предпросмотра</label>*/}
+                                            {/*    <Select*/}
+                                            {/*        options={previewQualityOptions}*/}
+                                            {/*        placeholder="Выберите качество предпросмотра"*/}
+                                            {/*        id="quality"*/}
+                                            {/*        // type="text"*/}
+                                            {/*        // value={category}*/}
+                                            {/*        value={previewQualityOptions.filter(option => option.label === previewQualityLabel)}*/}
+                                            {/*        onChange={selectPreviewQualityHandler}*/}
+                                            {/*        styles={customStyles}*/}
+                                            {/*    />*/}
 
-                                            </div>
-
-                                            <div className="form-field">
-                                                {/*<a className="waves-effect waves-light btn-large">Сканировать</a>*/}
-                                                <button className="btn red darken-3" onClick={stopScanning}
-                                                        style={{marginRight: 10}}>ПРЕРВАТЬ
-                                                </button>
-
-                                            </div>
+                                            {/*</div>*/}
 
                                             {/*<div className="progress">*/}
                                             {/*    <div className="determinate" style={progressBar}/>*/}
                                             {/*</div>*/}
                                             <div className="status">
                                                 <p>Точек получено: {store.getState().points.length}</p>
-                                                <p>Точек отрисовано: {Math.floor((store.getState().points.length) / previewQuality)}</p>
+                                                <p>Точек
+                                                    отрисовано: {Math.floor((store.getState().points.length) / previewQuality)}</p>
                                                 <p>Прогресс: {progress}%</p>
-                                                <p>Время сканирования: {timeToString((Date.now() - startTime) / 1000)}</p>
+                                                <p>Время
+                                                    сканирования: {timeToString((Date.now() - startTime) / 1000)}</p>
+                                            </div>
+
+                                            <div className="button-group">
+                                                {/*<a className="waves-effect waves-light btn-large">Сканировать</a>*/}
+                                                <button className="btn red darken-3" onClick={stopScanning}
+                                                        style={{marginRight: 10}}>ПРЕРВАТЬ
+                                                </button>
+
                                             </div>
                                         </>
                                     ) : (
                                         <>
-                                        <span className="card-title"><h4>Настройки</h4></span>
+                                            <span className="card-title"><h4 className="">НАСТРОЙКИ</h4></span>
 
-                                        <div className="form-field">
-                                        <label htmlFor="resolution">Качество сканирования</label>
-                                        <Select
-                                        options={resolutionOptions}
-                                        placeholder="Выберите качество сканирования"
-                                        id="resolution"
-                                        // type="text"
-                                        // value={category}
-                                        value={resolutionOptions.filter(option => option.label === resolution)}
-                                        onChange={selectHandler}
-                                        styles={customStyles}
-                                        />
+                                            <div className="form-field">
+                                                <label htmlFor="resolution">Качество сканирования</label>
+                                                <Select
+                                                    options={resolutionOptions}
+                                                    placeholder="Выберите качество сканирования"
+                                                    id="resolution"
+                                                    // type="text"
+                                                    // value={category}
+                                                    value={resolutionOptions.filter(option => option.label === resolution)}
+                                                    onChange={selectHandler}
+                                                    styles={customStyles}
+                                                />
 
-                                        </div>
+                                            </div>
 
-                                        <div className="form-field">
-                                        <p>
-                                        <label>
-                                        <input type="checkbox" className="filled-in" checked={partialScan}
-                                        onChange={e => setPartialScan(!partialScan)}/>
-                                        <span>Частичное сканирование</span>
-                                        </label>
-                                        </p>
-                                        </div>
+                                            <div className="form-field">
+                                                <p>
+                                                    <label>
+                                                        <input type="checkbox" className="filled-in"
+                                                               checked={partialScan}
+                                                               onChange={e => setPartialScan(!partialScan)}/>
+                                                        <span>Частичное сканирование</span>
+                                                    </label>
+                                                </p>
+                                            </div>
 
-                                    {partialScan ? (
-                                        <div className="form-field">
-                                        <label htmlFor="angle">Угол сканирования в градусах</label>
-                                        <input
-                                        placeholder="Введите угол сканирования"
-                                        id="angle"
-                                        type="text"
-                                        value={angle}
-                                        onChange={e => setAngle(e.target.value)}
-                                        />
-                                        </div>
-                                        ) : null}
+                                            {partialScan ? (
+                                                <div className="form-field">
+                                                    <label htmlFor="angle">Угол сканирования в градусах</label>
+                                                    <input
+                                                        placeholder="Введите угол сканирования"
+                                                        id="angle"
+                                                        type="text"
+                                                        value={angle}
+                                                        onChange={e => setAngle(e.target.value)}
+                                                    />
+                                                </div>
+                                            ) : null}
 
-                                        <div className="form-field">
-                                            {/*<a className="waves-effect waves-light btn-large">Сканировать</a>*/}
-                                            <button className="btn teal" onClick={startScanning}
-                                                    style={{marginRight: 10}}>СКАНИРОВАТЬ
-                                            </button>
+                                            <div className="button-group">
+                                                {/*<a className="waves-effect waves-light btn-large">Сканировать</a>*/}
+                                                <button className="btn green darken-4" onClick={startScanning}
+                                                        style={{marginRight: 10}}>СКАНИРОВАТЬ
+                                                </button>
 
-                                        </div>
+                                            </div>
                                         </>
                                     )}
 
